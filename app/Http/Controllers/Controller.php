@@ -90,4 +90,16 @@ class Controller extends BaseController
 
         return $return;
     }
+
+    /**
+     * 跳转成功页面
+     * @param string $msg   提示消息
+     * @param string $url   跳转地址
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function successPage($msg='',$url='/backend/home'){
+        $successUrl = route('success',['msg'=>$msg,'url'=>$url]);
+
+        return redirect($successUrl);
+    }
 }
