@@ -134,4 +134,5 @@
     <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>
     @stack('js')
     @yield('js')
+    <script src="{{ asset('js/backend.js') }}"></script>
 @stop
