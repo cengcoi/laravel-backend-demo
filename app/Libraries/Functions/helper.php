@@ -9,14 +9,14 @@
 
 
 if(!function_exists('cnMobileValidate')){
-	/**
-	 * 中国手机号码验证
-	 * @param string $mobile    手机号码
-	 * @return bool
-	 */
-	function cnMobileValidate($mobile){
-		return preg_match('/^(13[0-9]|14[5,7]|15[0,1,2,5,6,7,8,9]|16[6]|17[0,6,7,8,9]|18[0-9]|19[9])\d{8}$/',$mobile) ? true : false;
-	}
+    /**
+     * 中国手机号码验证
+     * @param string $mobile    手机号码
+     * @return bool
+     */
+    function cnMobileValidate($mobile){
+        return preg_match('/^(13[0-9]|14[5,7]|15[0,1,2,5,6,7,8,9]|16[6]|17[0,6,7,8,9]|18[0-9]|19[9])\d{8}$/',$mobile) ? true : false;
+    }
 }
 
 if(!function_exists('simpleMobileValidate')){
@@ -47,9 +47,9 @@ if(!function_exists('imgUrl')){
      * @param string $url   原始地址
      * @return string
      */
-	function imgUrl($url){
+    function imgUrl($url){
         return $url ? config('mbnb.IMG_DOMAIN').$url : '';
-	}
+    }
 }
 
 
@@ -133,7 +133,10 @@ if(!function_exists('curlPost')){
         curl_setopt($ch,CURLOPT_POST,true);
         curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
         $return = curl_exec($ch);
+        $rspCode = curl_getinfo($ch,CURLINFO_HTTP_CODE);
         curl_close($ch);
+        if($rspCode != 200)
+            return false;
         return $return;
     }
 }
@@ -155,7 +158,10 @@ if(!function_exists('curlPostJson')){
         curl_setopt($ch,CURLOPT_POST,true);
         curl_setopt($ch,CURLOPT_POSTFIELDS,json_encode($data));
         $return = curl_exec($ch);
+        $rspCode = curl_getinfo($ch,CURLINFO_HTTP_CODE);
         curl_close($ch);
+        if($rspCode != 200)
+            return false;
         return $return;
     }
 }
@@ -176,7 +182,10 @@ if(!function_exists('curlGet')){
         curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,5);
         curl_setopt($ch,CURLOPT_TIMEOUT,20);
         $return = curl_exec($ch);
+        $rspCode = curl_getinfo($ch,CURLINFO_HTTP_CODE);
         curl_close($ch);
+        if($rspCode != 200)
+            return false;
         return $return;
     }
 }
@@ -233,7 +242,7 @@ if(!function_exists('emailValidate')){
      * @param string $email 邮箱地址
      * @return bool
      */
-     function emailValidate($email){
+    function emailValidate($email){
         return preg_match('/^(\w)+(\.-\w+)*@(\w)+((\.\w{2,3}){1,3})$/i',$email) == 0 ? false : true;
     }
 }
@@ -316,7 +325,7 @@ if(!function_exists('orderSn')){
      * @return string
      */
     function orderSn(){
-        return substr(date('Ymd'),1).randomNum(2).date('Hi').randomNum(3);
+        return substr(date('Ymd'),1).randomNum(2).date('His').randomNum(5);
     }
 }
 
@@ -327,7 +336,7 @@ if(!function_exists('orderSnValidate')){
      * @return bool
      */
     function orderSnValidate($orderSn){
-        return preg_match('/^\d{16}$/',$orderSn) == 0 ? false : true;
+        return preg_match('/^\d{20}$/',$orderSn) == 0 ? false : true;
     }
 
 }
@@ -590,4 +599,77 @@ if(!function_exists('createUuid')){
     }
 }
 
+if(!function_exists('privateKeyFile2String')){
+    /**
+     * 私钥文件转字符串
+     * @param string $path  文件地址
+     * @return mixed|string
+     */
+    function privateKeyFile2String($path){
+        if(!is_file($path) && !is_readable($path))
+            return '';
+
+        return str_replace(["\n","-----BEGIN PRIVATE KEY-----","-----END PRIVATE KEY-----","-----BEGIN RSA PRIVATE KEY-----","-----END RSA PRIVATE KEY-----"],'',file_get_contents($path));
+    }
+}
+
+if(!function_exists('string2PrivateKeyFile')){
+    /**
+     * 字符串转私钥文件
+     * @param string $str   字符串
+     * @param string $path  保存地址
+     * @return bool
+     */
+    function string2PrivateKeyFile($str,$path){
+        if(!is_string($str) || empty($str))
+            return false;
+
+        $dir = dirname($path);
+
+        if(!is_writable($dir))
+            return false;
+
+        $str = "-----BEGIN RSA PRIVATE KEY-----\n" .
+            wordwrap($str, 64, "\n", true) .
+            "\n-----END RSA PRIVATE KEY-----";
+
+        return file_put_contents($path,$str) ? true : false;
+    }
+}
+
+if(!function_exists('publicKeyFile2String')){
+    /**
+     * 公钥文件转字符串
+     * @param string $path  公钥文件地址
+     * @return mixed|string
+     */
+    function publicKeyFile2String($path){
+        if(!is_file($path) && !is_readable($path))
+            return '';
+
+        return str_replace(["\n","-----BEGIN PUBLIC KEY-----","-----END PUBLIC KEY-----"],'',file_get_contents($path));
+    }
+}
+
+if(!function_exists('string2PublicFile')){
+    /**
+     * 字符串转成公钥
+     * @param string $str   公钥字符串
+     * @param string $path  公钥储存地址
+     * @return bool
+     */
+    function string2PublicFile($str,$path){
+        if(!is_string($str) || empty($str))
+            return false;
+
+        if(!is_writable(dirname($path)))
+            return false;
+
+        $str = "-----BEGIN PUBLIC KEY-----\n" .
+            wordwrap($str, 64, "\n", true) .
+            "\n-----END PUBLIC KEY-----";
+
+        return file_put_contents($path,$str) ? true : false;
+    }
+}
 
