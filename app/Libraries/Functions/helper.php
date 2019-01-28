@@ -673,3 +673,17 @@ if(!function_exists('string2PublicFile')){
     }
 }
 
+if(!function_exists('humanFileSize')){
+    /**
+     * 文件大小转化
+     * @param int $bytes        文件字节数
+     * @param int $decimals     精度
+     * @return string
+     */
+    function humanFileSize($bytes, $decimals = 2) {
+        $sz = 'BKMGTP';
+        $factor = floor((strlen($bytes) - 1) / 3);
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$sz[$factor];
+    }
+}
+
